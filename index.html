@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#d92736"><title>PokDex — Version 2.22</title>
+<style>
+:root{--red:#d92736;--dark:#17191f;--muted:#6e7580;--bg:#f3f4f6;--line:#e4e6ea;--white:#fff;--green:#168653}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--dark);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:linear-gradient(135deg,#e63846,#a91625);color:white;padding:17px 18px 21px;border-radius:0 0 24px 24px}
+.head{display:flex;justify-content:space-between;align-items:center}.logo{font-weight:950;font-size:29px;letter-spacing:-1px}.subtitle{font-size:12px;opacity:.88}.version{font-size:11px;border:1px solid #ffffff70;background:#ffffff20;border-radius:99px;padding:6px 9px}
+main{max-width:780px;margin:auto;padding:16px 14px 100px}.page{display:none}.page.active{display:block}h1{font-size:23px;margin:7px 0 6px}.desc{color:var(--muted);font-size:13px;margin:0 0 15px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.card,.panel{background:white;border:1px solid var(--line);border-radius:17px;padding:14px;box-shadow:0 3px 12px #18202b08}.tile{min-height:120px;text-align:left;color:inherit;cursor:pointer}.tile .emoji{font-size:27px}.tile b{display:block;margin:6px 0 3px}.tile small{color:var(--muted);line-height:1.35}
+button{font:inherit;cursor:pointer}.primary{background:var(--red);color:#fff;border:0;border-radius:11px;padding:11px 15px;font-weight:800}.secondary{background:#f0f1f4;color:var(--dark);border:0;border-radius:11px;padding:10px 13px;font-weight:750}.back{border:0;background:none;color:var(--red);font-weight:800;padding:3px 0 10px}
+nav{position:fixed;z-index:10;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:6px 3px max(6px,env(safe-area-inset-bottom))}
+nav button{border:0;background:none;color:#737985;font-size:11px;font-weight:750;padding:4px}nav button span{display:block;font-size:21px}nav button.active{color:var(--red)}
+input,select{font:inherit;width:100%;border:1px solid var(--line);border-radius:11px;padding:11px;background:white;color:var(--dark)}
+.list{display:grid;gap:9px;margin-top:12px}.pokemon{display:flex;align-items:center;gap:12px;cursor:pointer}.pokemon-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;border:0;background:transparent;padding:0;text-align:left;color:inherit}.sprite{width:64px;height:64px;border-radius:14px;background:#fff0f1;display:grid;place-items:center;flex-shrink:0;overflow:hidden}.sprite img{width:100%;height:100%;object-fit:contain}.sprite.undiscovered img,.dex-undiscovered{filter:brightness(0) saturate(100%)}.pokemon b{display:block}.status-button{width:40px;height:40px;min-width:40px;border-radius:50%;border:1px solid #d9dde4;background:#fff;display:grid;place-items:center;padding:6px;box-shadow:0 2px 5px #18202b12}.status-button:active{transform:scale(.94)}.status-button img{width:27px;height:27px;object-fit:contain}.status-button .status-eye{width:22px;height:22px}.status-button .status-star{font-size:23px;color:#f2c500;line-height:1}.pokemon-arrow{color:#9aa1ab;font-size:22px}.muted{color:var(--muted);font-size:12px}.tag{display:inline-block;background:#fff0f1;color:#a91625;padding:5px 9px;border-radius:99px;font-size:11px;font-weight:850}
+.progress{height:9px;background:#eceef1;border-radius:99px;overflow:hidden}.progress>i{display:block;height:100%;background:var(--red);width:0}
+.big{font-size:32px;color:var(--red);font-weight:950;font-variant-numeric:tabular-nums}.stat{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)}.stat:last-child{border:0}
+.tabs{display:flex;gap:7px;overflow:auto;margin:12px 0}.tabs button{white-space:nowrap;border:0;background:#e9ebef;padding:9px 12px;border-radius:10px;font-weight:750}.tabs button.active{background:var(--red);color:white}
+.art{height:150px;border-radius:17px;background:linear-gradient(135deg,#fff0f1,#edf0f5);display:grid;place-items:center;margin:12px 0;overflow:hidden}.art img{height:82%;max-width:82%;object-fit:contain}.guess-silhouette img{filter:brightness(0) saturate(100%)}#guessArt img{width:65%;height:65%;object-fit:contain}
+.choice{display:block;width:100%;text-align:left;border:1px solid var(--line);background:white;border-radius:11px;padding:12px;margin:7px 0;font-weight:750}.choice:disabled{opacity:.5}.answers{display:grid;grid-template-columns:1fr 1fr;gap:8px}.answers .choice{text-align:center;margin:0}
+.notice{background:#fff7e6;color:#77520c;border-radius:12px;padding:11px;font-size:12px;margin:12px 0}.good{color:var(--green);font-weight:850}.bad{color:var(--red);font-weight:850}
+.modal{position:fixed;inset:0;background:#10131bcc;display:none;z-index:20;overflow:auto;padding:18px}.modal.show{display:block}.modalbox{max-width:600px;margin:20px auto;background:white;border-radius:20px;padding:17px;min-height:300px}
+.statbtn{display:flex;justify-content:space-between;align-items:center}.locked{opacity:.5}
+.attack-section{margin:12px 0 16px}.attack-section h3{font-size:14px;margin:0 0 8px}.attack-table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:13px;background:#fff}.attack-table{width:100%;border-collapse:collapse;min-width:470px;font-size:12px}.attack-table th{background:#f5f6f8;color:#656d79;text-align:left;font-size:10px;letter-spacing:.04em;padding:10px 8px}.attack-table td{padding:11px 8px;border-top:1px solid var(--line);vertical-align:middle}.attack-name{font-weight:800}.attack-level{font-weight:800;color:var(--red);white-space:nowrap}.effect-pill{display:inline-block;padding:4px 7px;border-radius:99px;font-size:10px;font-weight:800;background:#e9f6ef;color:#137448;white-space:nowrap}.effect-pill.no{background:#eef0f3;color:#5d6570}.power{font-weight:900;font-variant-numeric:tabular-nums}.power-empty{display:inline-block;width:42px;height:7px;border-radius:99px;background:#e6e8ec;vertical-align:middle}.attack-note{font-size:11px;color:var(--muted);line-height:1.45;margin:8px 2px}
+@media(min-width:600px){main{padding-top:22px}.tile{padding:18px;min-height:135px}}
+.region-map{background-color:#dcebd9}.map-pin{cursor:pointer;box-shadow:0 2px 5px #0002}.map-pin:focus,.map-pin:hover{outline:2px solid var(--red)}
+.map-road{fill:none;stroke:#fff8e8;stroke-width:13;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 1px 1px #789)}.map-marker{cursor:pointer}.map-city{fill:#e94b55;stroke:#fff;stroke-width:5;filter:drop-shadow(0 2px 2px #526)}.map-label{font: bold 17px system-ui;fill:#29453a;paint-order:stroke;stroke:#eaf4df;stroke-width:5px;stroke-linejoin:round}.map-marker:focus{outline:none}.map-marker:focus .map-city{stroke:#f5c542;stroke-width:9}
+
+.dex-summary{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.dex-count{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;flex:1;min-width:115px}
+.dex-count strong{display:block;font-size:22px;color:var(--red)}
+.dex-entries{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:7px;margin-top:10px}
+.dex-entry{display:flex;align-items:center;gap:7px;text-align:left;padding:7px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--dark);font-size:12px}
+.dex-entry img{width:38px;height:38px;object-fit:contain}
+.dex-entry:disabled{opacity:.65}
+</style></head>
+<body>
+<header><div class="head"><div><div class="logo">PokDex</div><div class="subtitle">Ton encyclopédie Pokémon</div></div><div class="version">VERSION 2.18</div></div></header>
+<main>
+<section id="home" class="page active">
+<h1>Bienvenue dans PokDex !</h1><p class="desc">Retrouve tes Pokémon, tes jeux et tes mini-jeux au même endroit.</p>
+<div class="grid">
+<button class="card tile" onclick="go('international')"><span class="emoji">🌐</span><b>International</b><small>Tous les Pokémon réunis</small></button>
+<button class="card tile" onclick="go('regions')"><span class="emoji">🌍</span><b>Régions</b><small>Choisir un jeu et son Pokédex</small></button>
+<button class="card tile" onclick="go('items')"><span class="emoji">🎒</span><b>Objets</b><small>Objets classés par catégorie</small></button>
+<button class="card tile" onclick="go('maps')"><span class="emoji">🗺️</span><b>Cartes</b><small>Villes, routes et lieux</small></button>
+</div>
+<div class="panel" style="margin-top:12px"><b>📘 Ma collection</b><p class="muted" id="homeProgress">0 Pokémon suivis</p><div class="progress"><i id="homeBar"></i></div><button class="primary" style="margin-top:12px" onclick="go('pokedex')">Ouvrir mon Pokédex</button></div>
+</section>
+
+<section id="pokedex" class="page"><h1>Pokédex</h1><p class="desc">Recherche et suis ta collection.</p><input id="dexSearch" placeholder="Nom ou numéro du Pokémon" oninput="renderDex()"><div id="dexStats" class="panel" style="margin-top:10px"></div><div id="dexList" class="list"></div></section>
+<section id="international" class="page"><button class="back" onclick="go('home')">← Accueil</button><h1>Pokédex International</h1><p class="desc">Les 1 025 espèces sont chargées depuis PokéAPI avec leurs noms français.</p><div id="intlList" class="list"></div></section>
+<section id="regions" class="page"><button class="back" onclick="go('home')">← Accueil</button><h1>Régions et jeux</h1><p class="desc">Sélectionne une région, puis un jeu pour afficher son Pokédex régional, le nombre exact d’entrées et la liste triée.</p><div id="regionGrid" class="grid"></div><div id="gamesBox" class="panel" style="display:none;margin-top:12px"></div></section>
+<section id="items" class="page"><button class="back" onclick="go('home')">← Accueil</button><h1>Objets</h1><p class="desc">Les catégories prévues pour chaque jeu.</p><div class="grid">
+<div class="card tile"><span class="emoji">🧪</span><b>Soins</b><small>Potions et remèdes</small></div><div class="card tile"><span class="emoji">⚪</span><b>Poké Balls</b><small>Outils de capture</small></div><div class="card tile"><span class="emoji">💎</span><b>Évolution</b><small>Pierres et objets</small></div><div class="card tile"><span class="emoji">🍓</span><b>Baies et objets tenus</b><small>Objets utilisables</small></div><div class="card tile"><span class="emoji">📀</span><b>CT et CS</b><small>Machines de capacités</small></div><div class="card tile"><span class="emoji">🔑</span><b>Objets importants</b><small>Objets clés</small></div></div><div class="notice">Les listes détaillées seront ajoutées séparément pour chaque version de jeu.</div></section>
+<section id="maps" class="page"><button class="back" onclick="go('home')">← Accueil</button><h1>Atlas des régions</h1><p class="desc">Choisis une région puis une édition. Les cartes affichent les lieux et les liaisons géographiques uniquement : aucune indication de Pokémon.</p><div id="mapGrid" class="grid"></div><div id="mapBox" class="panel" style="display:none;margin-top:12px"></div></section>
+<section id="games" class="page"><h1>Mini-jeux</h1><p class="desc">Choisis ton défi.</p><button class="card tile" style="width:100%;margin-bottom:10px" onclick="go('statsMenu')"><span class="emoji">📊</span><b>Défi des statistiques</b><small>Plus petit score ou Plus grand score</small></button><button class="card tile" style="width:100%" onclick="go('guessMenu')"><span class="emoji">❔</span><b>Devine le Pokémon</b><small>Mode normal et mode Hardcore</small></button></section>
+<section id="statsMenu" class="page"><button class="back" onclick="go('games')">← Mini-jeux</button><h1>Défi des statistiques</h1><p class="desc">Chaque catégorie ne peut être choisie qu'une fois par partie.</p><div class="grid"><button class="card tile" onclick="startStats('low')"><span class="emoji">⬇️</span><b>Plus petit score</b><small>Record : <span id="lowRecord">Aucun</span></small></button><button class="card tile" onclick="startStats('high')"><span class="emoji">⬆️</span><b>Plus grand score</b><small>Record : <span id="highRecord">Aucun</span></small></button></div><div class="notice">Dans cette version, le défi utilise les 5 statistiques de la première génération. Les Pokémon et valeurs sont des exemples de démonstration.</div></section>
+<section id="statsGame" class="page"><button class="back" onclick="go('statsMenu')">← Quitter la partie</button><span class="tag" id="statsMode"></span><h1>Défi des statistiques</h1><div class="panel"><div class="muted">Score total</div><div class="big" id="statsScore">0</div><div class="muted" id="statsStep"></div></div><div class="art" id="statsArt">❔</div><h2 id="statsName"></h2><p class="desc">Choisis une statistique à révéler :</p><div id="statOptions"></div><p id="statsFeedback" class="muted"></p><button class="primary" id="statsNext" style="display:none" onclick="statsNext()">Pokémon suivant</button></section>
+<section id="statsEnd" class="page"><h1>Partie terminée !</h1><div class="panel"><div class="muted">Score final</div><div class="big" id="statsFinal"></div><p id="statsRecordText"></p></div><button class="primary" style="margin-top:12px" onclick="go('statsMenu')">Retour aux modes</button></section>
+<section id="guessMenu" class="page"><button class="back" onclick="go('games')">← Mini-jeux</button><h1>Devine le Pokémon</h1><div class="panel"><div class="muted">Progression du mode normal</div><div class="big"><span id="normalPts">0</span> / 40</div><div class="progress"><i id="normalBar"></i></div></div><button class="card tile" style="width:100%;margin-top:12px" onclick="startGuess('normal')"><span class="emoji">🎯</span><b>Mode normal</b><small>4 propositions pour trouver le Pokémon.</small></button><button id="hardButton" class="card tile locked" style="width:100%;margin-top:10px" onclick="startGuess('hardcore')"><span class="emoji">🔥</span><b>Mode Hardcore</b><small id="hardText">Débloqué à 40 points en mode normal.</small></button><div class="notice">En Hardcore, après une bonne réponse, une question chromatique supplémentaire apparaît avec 50 % de chances.</div></section>
+<section id="guessGame" class="page"><button class="back" onclick="go('guessMenu')">← Quitter la partie</button><span class="tag" id="guessMode"></span><h1>Devine le Pokémon</h1><div class="panel"><div class="muted">Score de la partie</div><div class="big" id="guessScore">0</div></div><div class="art" id="guessArt">❔</div><h2 id="guessPrompt">Quel est ce Pokémon ?</h2><div id="guessOptions" class="answers"></div><p id="guessFeedback"></p><button class="primary" id="guessNext" style="display:none" onclick="guessNext()">Continuer</button></section>
+</main>
+<nav><button class="active" data-id="home" onclick="go('home')"><span>🏠</span>Accueil</button><button data-id="maps" onclick="go('maps')"><span>🗺️</span>Carte</button><button data-id="pokedex" onclick="go('pokedex')"><span>📖</span>Pokédex</button><button data-id="games" onclick="go('games')"><span>🎮</span>Mini-jeux</button></nav>
+<div id="modal" class="modal" onclick="if(event.target.id==='modal')closeModal()"><div class="modalbox"><button class="back" onclick="closeModal()">← Fermer</button><div id="modalContent"></div></div></div>
+<script>
+let mons=[
+{id:1,n:"Bulbizarre",e:"🌱",gen:1,stats:[45,49,49,65,45],shiny:false,where:"Forêt de Jade et autres lieux selon le jeu",attacks:"Charge, Rugissement, Vampigraine",evo:"Ivysaur au niveau 16, puis Florizarre au niveau 32"},
+{id:4,n:"Salamèche",e:"🔥",gen:1,stats:[39,52,43,50,65],shiny:false,where:"Pokémon de départ à Kanto dans certains jeux",attacks:"Griffe, Rugissement, Flammèche",evo:"Reptincel au niveau 16, puis Dracaufeu au niveau 36"},
+{id:7,n:"Carapuce",e:"🐢",gen:1,stats:[44,48,65,50,43],shiny:true,where:"Pokémon de départ à Kanto dans certains jeux",attacks:"Charge, Mimi-Queue, Pistolet à O",evo:"Carabaffe au niveau 16, puis Tortank au niveau 36"},
+{id:25,n:"Pikachu",e:"⚡",gen:1,stats:[35,55,30,50,90],shiny:true,where:"Forêt de Jade dans Pokémon Rouge et Bleu",attacks:"Éclair, Mimi-Queue, Vive-Attaque",evo:"Raichu avec une Pierre Foudre"},
+{id:54,n:"Psykokwak",e:"🦆",gen:1,stats:[50,52,48,50,55],shiny:false,where:"Plusieurs routes et points d'eau selon le jeu",attacks:"Griffe, Pistolet à O, Choc Mental",evo:"Akwakwak au niveau 33"},
+{id:133,n:"Évoli",e:"🦊",gen:1,stats:[55,55,50,45,55],shiny:false,where:"Céladopole dans plusieurs jeux de Kanto",attacks:"Charge, Mimi-Queue, Vive-Attaque",evo:"Plusieurs évolutions selon la méthode utilisée"},
+{id:143,n:"Ronflex",e:"😴",gen:1,stats:[160,110,65,65,30],shiny:false,where:"Lieux fixes dans certains jeux de Kanto",attacks:"Charge, Bâillement, Plaquage",evo:"Pas d'évolution"},
+{id:150,n:"Mewtwo",e:"🧬",gen:1,stats:[106,110,90,154,130],shiny:true,where:"Grotte Azurée dans certains jeux",attacks:"Choc Mental, Météores, Psyko",evo:"Pas d'évolution"}
+];
+const statNames=["PV","Attaque","Défense","Spécial","Vitesse"];
+const regions=["Kanto","Johto","Hoenn","Sinnoh","Unys","Kalos","Alola","Galar","Paldea","Hisui"];
+const games={"Kanto":["Pokémon Rouge","Pokémon Bleu","Pokémon Jaune"],"Johto":["Pokémon Or","Pokémon Argent","Pokémon Cristal"],"Hoenn":["Pokémon Rubis","Pokémon Saphir","Pokémon Émeraude"],"Sinnoh":["Pokémon Diamant","Pokémon Perle","Pokémon Platine"],"Unys":["Pokémon Noir","Pokémon Blanc","Pokémon Noir 2","Pokémon Blanc 2"],"Kalos":["Pokémon X","Pokémon Y"],"Alola":["Pokémon Soleil","Pokémon Lune","Ultra-Soleil","Ultra-Lune"],"Galar":["Épée","Bouclier"],"Paldea":["Pokémon Écarlate","Pokémon Violet"],"Hisui":["Légendes Pokémon : Arceus"]};
+// Correspondance des jeux avec les Pokédex régionaux de PokéAPI.
+const gameDexes={
+"Pokémon Rouge":["kanto"],"Pokémon Bleu":["kanto"],"Pokémon Jaune":["kanto"],
+"Pokémon Or":["original-johto"],"Pokémon Argent":["original-johto"],"Pokémon Cristal":["original-johto"],
+"Pokémon Rubis":["hoenn"],"Pokémon Saphir":["hoenn"],"Pokémon Émeraude":["hoenn"],
+"Pokémon Diamant":["original-sinnoh"],"Pokémon Perle":["original-sinnoh"],"Pokémon Platine":["extended-sinnoh"],
+"Pokémon Noir":["original-unova"],"Pokémon Blanc":["original-unova"],"Pokémon Noir 2":["updated-unova"],"Pokémon Blanc 2":["updated-unova"],
+"Pokémon X":["kalos-central","kalos-coastal","kalos-mountain"],"Pokémon Y":["kalos-central","kalos-coastal","kalos-mountain"],
+"Pokémon Soleil":["original-alola"],"Pokémon Lune":["original-alola"],"Ultra-Soleil":["updated-alola"],"Ultra-Lune":["updated-alola"],
+"Épée":["galar"],"Bouclier":["galar"],
+"Pokémon Écarlate":["paldea"],"Pokémon Violet":["paldea"],
+"Légendes Pokémon : Arceus":["hisui"]
+};
+const dexLabels={"kanto":"Kanto","original-johto":"Johto (Or / Argent / Cristal)","hoenn":"Hoenn","original-sinnoh":"Sinnoh (Diamant / Perle)","extended-sinnoh":"Sinnoh (Platine)","original-unova":"Unys (Noir / Blanc)","updated-unova":"Unys (Noir 2 / Blanc 2)","kalos-central":"Kalos central","kalos-coastal":"Kalos côtier","kalos-mountain":"Kalos montagne","original-alola":"Alola (Soleil / Lune)","updated-alola":"Alola (Ultra-Soleil / Ultra-Lune)","galar":"Galar","hisui":"Hisui","paldea":"Paldea","kitakami":"Septentria","blueberry":"Institut Myrtille"};
+const dexCache={};
+let collection=JSON.parse(localStorage.getItem("pd2_collection")||"{}"),regionalCollection=JSON.parse(localStorage.getItem("pd2_regional_collection")||"{}"),statsMode="high",statsTotal=0,used=[],activeMon=null,guessMode="normal",guessTotal=0,normalPts=Number(localStorage.getItem("pd2_normal")||0),guessMon=null,bonusMon=null,guessPhase="name",zoom=200,selectedGame="Pokémon Rouge",selectedRegion="Kanto";
+function go(id){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x.dataset.id===id));refresh();window.scrollTo(0,0)}
+function refresh(){let vals=Object.values(collection);let count=vals.filter(v=>v!=="Non découvert").length;let done=vals.filter(v=>v==="Capturé"||v==="Chromatique").length;document.getElementById("homeProgress").textContent=count+" Pokémon découverts • "+done+" capturés";document.getElementById("homeBar").style.width=(count/mons.length*100)+"%";document.getElementById("lowRecord").textContent=localStorage.getItem("pd2_low")??"Aucun";document.getElementById("highRecord").textContent=localStorage.getItem("pd2_high")??"Aucun";document.getElementById("normalPts").textContent=Math.min(normalPts,40);document.getElementById("normalBar").style.width=Math.min(normalPts/40*100,100)+"%";let unlocked=normalPts>=40;document.getElementById("hardButton").classList.toggle("locked",!unlocked);document.getElementById("hardText").textContent=unlocked?"Mode débloqué !":"Débloqué à 40 points : "+normalPts+"/40"}
+function status(p){return collection[p.id]||"Non découvert"}
+function pokemonImage(p,shiny=false){let base="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork";return shiny?`${base}/shiny/${p.id}.png`:`${base}/${p.id}.png`}
+function statusIcon(s){if(s==="Non découvert")return `<svg class="status-eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" fill="none" stroke="#626b78" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="none" stroke="#626b78" stroke-width="2"/><path d="M4 20 20 4" stroke="#d92736" stroke-width="2.4" stroke-linecap="round"/></svg>`;if(s==="Découvert")return `<svg class="status-eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" fill="none" stroke="#626b78" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="none" stroke="#626b78" stroke-width="2"/></svg>`;if(s==="Capturé")return `<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" alt="Poké Ball rouge et blanche">`;return `<span class="status-star" aria-label="Chromatique">★</span>`}
+function nextStatus(s){return s==="Non découvert"?"Découvert":s==="Découvert"?"Capturé":s==="Capturé"?"Chromatique":"Non découvert"}
+function cycleStatus(id,event){if(event)event.stopPropagation();let p=mons.find(x=>x.id===id);collection[id]=nextStatus(status(p));localStorage.setItem("pd2_collection",JSON.stringify(collection));renderDex();refresh()}
+function pokemonRow(p){let s=status(p);return `<div class="card pokemon"><button class="pokemon-main" onclick="details(${p.id})" aria-label="Ouvrir la fiche de ${p.n}"><div class="sprite ${s==='Non découvert'?'undiscovered':''}"><img src="${pokemonImage(p,s==='Chromatique')}" alt="${s==='Non découvert'?'Silhouette non découverte':p.n}" loading="lazy" onerror="this.style.display='none';this.parentElement.textContent='${p.e}'"></div><div style="flex:1;min-width:0"><b>#${p.id} ${s==='Non découvert'?'???':p.n}</b><div class="muted">${s}</div></div></button><button class="status-button" onclick="cycleStatus(${p.id},event)" aria-label="Changer le statut de ${p.n}" title="Changer le statut">${statusIcon(s)}</button></div>`}
+function renderDex(){let q=(document.getElementById("dexSearch")?.value||"").toLowerCase();let found=mons.filter(p=>p.n.toLowerCase().includes(q)||String(p.id).includes(q));document.getElementById("dexList").innerHTML=found.map(pokemonRow).join("")||"<p class='muted'>Aucun résultat.</p>";let discovered=mons.filter(p=>status(p)!=="Non découvert").length,captured=mons.filter(p=>["Capturé","Chromatique"].includes(status(p))).length,shiny=mons.filter(p=>status(p)==="Chromatique").length;document.getElementById("dexStats").innerHTML=`<b>Progression de la sélection</b><p class="muted">${discovered}/${mons.length} découverts • ${captured} capturés • ${shiny} chromatiques</p><div class="progress"><i style="width:${discovered/mons.length*100}%"></i></div>`}
+function details(id){let p=mons.find(x=>x.id===id);let s=status(p);document.getElementById("modalContent").innerHTML=`<div class="art"><img class="${s==='Non découvert'?'dex-undiscovered':''}" src="${pokemonImage(p,s==='Chromatique')}" alt="${s==='Non découvert'?'Silhouette non découverte':s==='Chromatique'?'Illustration chromatique de '+p.n:'Illustration officielle de '+p.n}" onerror="this.style.display='none';this.parentElement.textContent='${p.e}'"></div><h1>#${p.id} ${s==='Non découvert'?'???':p.n}</h1><span class="tag">${s}</span><div class="tabs"><button class="active" onclick="detailTab(${id},'overview',this)">Aperçu</button><button onclick="detailTab(${id},'attacks',this)">Attaques</button><button onclick="detailTab(${id},'evolution',this)">Évolution</button><button onclick="detailTab(${id},'stats',this)">Statistiques</button></div><div id="detailBody"></div>`;detailTab(id,"overview",document.querySelector("#modalContent .tabs button"));document.getElementById("modal").classList.add("show");fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(r=>r.json()).then(d=>{let vals=d.stats; p.stats=[vals[0].base_stat,vals[1].base_stat,vals[2].base_stat,vals[3].base_stat,vals[5].base_stat]; if(document.getElementById("detailBody")&&document.querySelector("#modalContent h1")?.textContent.includes("#"+id)){let active=document.querySelector("#modalContent .tabs button.active");if(active?.textContent==="Statistiques")detailTab(id,"stats",active)}}).catch(()=>{})}
+function detailTab(id,tab,btn){document.querySelectorAll("#modalContent .tabs button").forEach(x=>x.classList.remove("active"));btn.classList.add("active");let p=mons.find(x=>x.id===id),body=document.getElementById("detailBody");if(tab==="overview")body.innerHTML=`<div class="stat"><b>Numéro</b><span>#${p.id}</span></div><div class="stat"><b>Génération</b><span>${p.gen}</span></div><p><b>Où le trouver ?</b><br><span class="muted">${p.where}</span></p>`;if(tab==="attacks"){
+ let rows=p.id===1?[
+  ["N. 1","Charge", "Non",35],["N. 1","Rugissement","Oui",0],["N. 7","Vampigraine","Oui",0],["N. 13","Fouet Lianes","Non",35],["N. 20","Poudre Toxik","Oui",0],["N. 27","Tranch’Herbe","Non",55],["N. 34","Croissance","Oui",0],["N. 41","Poudre Dodo","Oui",0],["N. 48","Lance-Soleil","Non",120]
+ ]:[];
+ if(rows.length){body.innerHTML=`<div class="attack-section"><h3>Attaques apprises par niveau</h3><div class="attack-table-wrap"><table class="attack-table"><thead><tr><th>NIVEAU</th><th>ATTAQUE</th><th>EFFET</th><th>PUISSANCE</th></tr></thead><tbody>${rows.map(a=>`<tr><td class="attack-level">${a[0]}</td><td class="attack-name">• ${a[1]}</td><td><span class="effect-pill ${a[2]==="Non"?"no":""}">${a[2]}</span></td><td class="power">${a[3]===0?'<span class="power-empty" aria-label="Aucun dégât direct"></span>':a[3]}</td></tr>`).join("")}</tbody></table></div><p class="attack-note">Exemple de données pour Bulbizarre dans Pokémon Rouge/Bleu (1re génération). Les attaques et niveaux peuvent changer selon le jeu.</p></div><div class="attack-section"><h3>Autres méthodes d’apprentissage</h3><p class="muted">Les CT/CS, reproduction et autres méthodes seront affichées dans des listes séparées lorsque les données du jeu choisi seront intégrées.</p></div>`}
+ else {body.innerHTML=`<div class="attack-section"><h3>Attaques de ${p.n}</h3><div class="notice">Les noms d’attaques de démonstration sont : ${p.attacks}. La liste détaillée avec niveau, effet et puissance n’est pas encore renseignée pour ce Pokémon.</div><p class="attack-note">Les attaques exactes dépendent du jeu sélectionné. Cette fiche sera complétée avec les données propres à chaque version.</p></div>`}
+ }if(tab==="evolution")body.innerHTML=`<b>Évolution</b><p>${p.evo}</p>`;if(tab==="stats")body.innerHTML=statNames.map((n,i)=>`<div class="stat"><b>${n}</b><span>${p.stats[i]}</span></div>`).join("")+`<div class="stat"><b>Total</b><b>${p.stats.reduce((a,b)=>a+b,0)}</b></div>`}
+function closeModal(){document.getElementById("modal").classList.remove("show")}
+
+const mapPlaces={
+"Kanto":["Bourg Palette","Jadielle","Argenta","Mont Sélénite","Azuria","Centrale","Carmin sur Mer","Lavanville","Céladopole","Safrania","Parmanie","Cramois'Île","Plateau Indigo","Forêt de Jade","Route Victoire"],
+"Johto":["Bourg Geon","Ville Griotte","Mauville","Écorcia","Doublonville","Parc Naturel","Rosalia","Tour Cendrée","Irisia","Oliville","Acajou","Lac Colère","Ébènelle","Mont Argenté"],
+"Hoenn":["Bourg-en-Vol","Rosyères","Clémenti-Ville","Mérouville","Cimetronelle","Vergazon","Lavandia","Poivressel","Autéquia","Nénucrique","Atalanopolis","Pacifiville","Caverne Fondmer","Grotte Origine"],
+"Sinnoh":["Bonaugure","Littorella","Féli-Cité","Joliberges","Floraville","Vestigion","Célestia","Unionpolis","Verchamps","Voilaroc","Frimapic","Aire de Survie","Ligue Pokémon","Mont Couronné"],
+"Unys":["Renouet","Arabelle","Ogoesse","Maillard","Volucité","Méanville","Port Yoneuve","Parsemille","Flocombe","Entrelasque","Janusia","Ligue Pokémon","Forêt d'Empoigne","Désert Délassant","Grotte Parsemille"],
+"Kalos":["Bourg Croquis","Quarellis","Neuvartault","Illumis","Fort-Vanitas","Relifac-le-Haut","Cromlac'h","Yantreizh","La Frescale","Auffrac-les-Congères","Caverne Gelée","Grotte Étincelante","Route 22"],
+"Alola":["Lili'i","Hau'oli","École des Dresseurs","Kantai","Ohana","Paradis Æther","KoniKoni","Village Toko","Mont Lanakila","Autel du Soleil / de la Lune","Village de la Route 2","Jungle Sombrefeuille","Colline Dicarat"],
+"Galar":["Paddoxton","Jeter-sur-Mer","Motorby","Greenbury","Skifford","Kickenham","Ludester","Corrifey","Smashings","Winscor","Mine de Galar","Forêt de Sleepwood","Route 10"],
+"Paldea":["Cuchalagua","Cuchalaga","Mesaledo","Cortondo","Jarramanca","Porto Marinada","Levalendura","Cuencia","Pinchoria","Frigao","Mont Nappé","Casseroya","Zone Zéro"],
+"Hisui":["Rusti-Cité","Plaines Obsidiennes","Marais Carmin","Côte Lazuli","Contrefort Couronné","Terres Immaculées","Mont Couronné","Plage de Tombolo","Île Crache-Feu","Temple de Sinnoh"]
+};
+function showMap(r, selectedEdition){
+ let b=document.getElementById("mapBox");b.style.display="block";
+ const places=mapPlaces[r]||[];
+ const editions=games[r]||[];
+ const edition=selectedEdition||editions[0]||"Carte régionale";
+ const editionControl='<label style="display:block;margin:8px 0 12px;font-weight:700">Édition du jeu<select id="mapEditionSelect" onchange="showMap(\''+r+'\',this.value)" style="display:block;width:100%;padding:11px;margin-top:6px;border:1px solid var(--line);border-radius:10px;background:white;color:var(--dark)">'+editions.map(g=>'<option value="'+g.replaceAll('&','&amp;').replaceAll('"','&quot;')+'" '+(g===edition?'selected':'')+'>'+g+'</option>').join('')+'</select></label>';
+ const uploadedMaps={"Kanto":"maps/kanto.webp","Johto":"maps/johto.jpg","Hoenn":"maps/hoenn.png","Sinnoh":"maps/sinnoh.jpg","Kalos":"maps/kalos.png","Paldea":"maps/paldea.png"};
+ if(uploadedMaps[r]){
+  zoom=100;
+  const mapPath=uploadedMaps[r];
+  b.innerHTML=`<b>Carte de ${r}</b>${editionControl}<p class="muted">Carte fournie pour ${r}. Tu peux zoomer pour voir les détails ; sélectionne un lieu dans la liste pour afficher son nom.</p>
+  <div style="overflow:auto;border:1px solid var(--line);border-radius:16px;background:#e8f0e7;max-height:75vh;text-align:center"><img id="regionalImageMap" src="${mapPath}" alt="Carte de la région de ${r}" style="display:block;width:100%;max-width:900px;height:auto;margin:0 auto;transform-origin:top center"></div>
+  <div class="row" style="display:flex;gap:8px;justify-content:center;align-items:center;margin-top:10px"><button class="choice" onclick="setRegionalImageZoom(-25)">−</button><b id="regionalImageZoomLabel">100 %</b><button class="choice" onclick="setRegionalImageZoom(25)">+</button><button class="choice" onclick="setRegionalImageZoom(0)">Réinitialiser</button></div>
+  <div id="mapPlaceInfo" class="notice" style="margin-top:10px">Sélectionne un lieu dans la liste pour afficher son nom.</div><h3 style="margin:14px 0 8px">Lieux de ${r}</h3><div class="grid">${places.map((x,i)=>`<button class="choice" onclick="mapPlaceInfo('${r}',${i})">📍 ${x}</button>`).join("")}</div>`;
+  window.currentMapRegion=r;return;
+ }
+ // Repères repositionnés d'après l'organisation géographique des cartes des jeux : nord en haut,
+ // côtes/îles séparées et connexions principales plutôt qu'un simple tracé dans l'ordre de la liste.
+ const layouts={
+ "Johto":{shape:"M145 105 Q260 45 390 80 L560 55 Q760 90 840 250 L790 500 Q650 590 470 570 L280 540 Q130 450 95 290 Z",xy:[[690,500],[530,470],[360,330],[420,430],[475,285],[520,220],[600,220],[620,185],[180,370],[260,300],[710,300],[730,205],[820,110],[105,120]],edges:[[0,1],[1,2],[2,3],[2,4],[4,5],[5,6],[6,7],[6,10],[10,11],[11,12],[3,8],[8,9],[9,2],[12,13]]},
+ "Hoenn":{shape:"M90 110 Q260 40 410 95 L650 80 Q850 150 850 330 L720 550 Q530 620 350 560 L140 440 Z",xy:[[490,545],[445,490],[260,390],[210,210],[490,210],[390,390],[510,340],[700,440],[330,145],[750,300],[650,400],[110,480],[650,490],[650,340]],edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[4,8],[7,9],[9,10],[10,12],[12,13],[0,11],[8,3]]},
+ "Sinnoh":{shape:"M390 45 L620 75 L800 230 L730 500 L500 610 L260 500 L150 250 Z",xy:[[260,510],[330,450],[360,330],[180,330],[300,220],[430,220],[520,310],[570,390],[680,430],[680,300],[500,90],[770,130],[820,235],[490,300]],edges:[[0,1],[1,2],[2,3],[2,4],[4,5],[5,6],[6,7],[7,8],[6,9],[5,10],[10,11],[11,12],[6,13],[13,5]]},
+ "Unys":{shape:"M440 35 Q650 55 760 210 L700 430 Q610 590 430 610 L270 480 L300 220 Z",xy:[[650,560],[620,480],[560,390],[460,330],[360,410],[470,250],[280,330],[330,190],[450,105],[570,180],[650,270],[470,65],[190,420],[220,250],[300,125]],edges:[[0,1],[1,2],[2,3],[3,4],[3,5],[5,6],[5,7],[7,8],[8,9],[9,10],[8,11],[4,12],[6,13],[7,14]]},
+ "Kalos":{shape:"M430 35 L650 90 L850 250 L730 510 L470 610 L210 490 L110 250 Z",xy:[[750,510],[660,450],[570,350],[490,300],[350,230],[260,330],[190,430],[300,520],[460,500],[550,130],[620,210],[210,150],[390,400]],edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[3,8],[4,9],[9,10],[5,11],[6,12]]},
+ "Alola":{shape:"M100 75 L340 65 L380 390 L170 450 Z M400 115 L650 80 L700 420 L470 470 Z M720 80 L910 110 L930 480 L740 510 Z M560 500 L700 490 L750 610 L590 620 Z",xy:[[220,150],[270,245],[300,330],[520,180],[560,270],[610,330],[560,420],[820,180],[840,300],[860,410],[330,390],[470,350],[180,340]],edges:[[0,1],[1,2],[2,10],[10,12],[3,4],[4,5],[5,6],[6,11],[7,8],[8,9],[2,3],[6,7]]},
+ "Galar":{shape:"M420 25 Q650 45 720 210 L650 360 L760 530 L550 620 L340 530 L400 360 L270 200 Z",xy:[[520,570],[470,500],[530,400],[320,390],[690,380],[530,300],[650,210],[300,250],[740,270],[560,100],[400,470],[350,170],[500,55]],edges:[[0,1],[1,2],[2,3],[2,4],[2,5],[5,6],[6,8],[5,7],[6,9],[1,10],[3,11],[9,12]]},
+ "Paldea":{shape:"M300 55 L600 35 L840 180 L790 460 L590 610 L300 560 L110 350 Z",xy:[[400,520],[280,440],[500,330],[230,360],[330,250],[160,270],[720,300],[650,430],[760,470],[570,100],[450,120],[660,180],[520,260]],edges:[[0,1],[1,3],[3,4],[4,2],[2,6],[6,7],[7,8],[2,5],[2,9],[9,10],[10,11],[2,12],[12,11]]},
+ "Hisui":{shape:"M350 45 L650 65 L850 260 L730 540 L450 620 L180 470 L110 220 Z",xy:[[300,480],[250,360],[650,390],[760,300],[500,330],[470,100],[520,270],[170,500],[820,450],[550,200]],edges:[[0,1],[1,4],[4,6],[6,5],[4,2],[2,3],[0,7],[2,8],[6,9]]}
+ };
+ const layout=layouts[r]||layouts.Johto;
+ const xy=layout.xy;
+ const roads=layout.edges.map(([a,c],i)=>{const p=xy[a],q=xy[c];return `<path d="M${p[0]} ${p[1]} Q${(p[0]+q[0])/2+((i%2)?18:-18)} ${(p[1]+q[1])/2-10} ${q[0]} ${q[1]}" class="map-road"/>`}).join("");
+ const markers=xy.map((p,i)=>{const label=places[i].replaceAll('&','&amp;');return `<g class="map-marker" role="button" tabindex="0" onclick="mapPlaceInfo('${r.replaceAll("'","\\'")}',${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();mapPlaceInfo('${r.replaceAll("'","\\'")}',${i})}"><circle cx="${p[0]}" cy="${p[1]}" r="13" class="map-city"/><circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#fff"/><text x="${p[0]+16}" y="${p[1]-12}" class="map-label">${label}</text></g>`}).join("");
+ b.innerHTML=`<b>Carte régionale — ${r}</b><p class="muted">Les repères et les liaisons ont été replacés pour suivre l'organisation géographique des jeux (orientation, îles, zones et grands axes). Schéma original non à l'échelle ; certaines routes secondaires et entrées de lieux ne sont pas représentées.</p>
+ <div style="overflow:auto;border:1px solid var(--line);border-radius:16px;background:#d9edf4;max-height:70vh"><svg id="regionalMapSvg" viewBox="0 0 1000 650" style="display:block;width:${zoom}%;min-width:600px;height:auto;transform-origin:top left" role="img" aria-label="Carte régionale interactive de ${r}"><defs><linearGradient id="sea-${r}" x2="0" y2="1"><stop stop-color="#bce5ef"/><stop offset="1" stop-color="#d9f0f1"/></linearGradient><linearGradient id="land-${r}" x2="0" y2="1"><stop stop-color="#d8edbd"/><stop offset="1" stop-color="#a9d18e"/></linearGradient></defs><rect width="1000" height="650" fill="url(#sea-${r})"/><path d="${layout.shape}" fill="url(#land-${r})" stroke="#6c9e69" stroke-width="8" stroke-linejoin="round"/><path d="M120 120 Q300 200 250 500 M760 100 Q650 280 850 500 M180 350 Q480 260 800 380" fill="none" stroke="#8fbd80" stroke-width="12" opacity=".18"/>${roads}${markers}<text x="35" y="620" font-size="18" fill="#527b88">${r} · carte interactive</text></svg></div>
+ <div style="display:flex;gap:8px;align-items:center;justify-content:center;margin:10px 0"><button class="secondary" onclick="regionalMapZoom(-25)">−</button><b id="regionalZoomLabel">${zoom}%</b><button class="secondary" onclick="regionalMapZoom(25)">+</button><button class="secondary" onclick="regionalMapZoom(0)">Réinitialiser</button></div>
+ <div class="notice">📍 Cette carte présente uniquement les lieux et les liaisons principales. Aucun marqueur, emplacement ou renseignement sur les Pokémon n’est affiché. Les tracés restent schématiques.</div><div id="mapPlaceInfo" class="notice">Sélectionne un lieu sur la carte ou dans la liste.</div><h3 style="margin:14px 0 8px">Lieux de ${r}</h3><div class="grid">${places.map((x,i)=>`<button class="choice" onclick="mapPlaceInfo('${r.replaceAll("'","\\'")}',${i})">📍 ${x}</button>`).join("")}</div>`;
+ window.currentMapRegion=r;
+}
+function regionalMapZoom(delta){zoom=delta===0?100:Math.max(75,Math.min(250,zoom+delta));const svg=document.getElementById("regionalMapSvg");if(svg)svg.style.width=zoom+"%";const label=document.getElementById("regionalZoomLabel");if(label)label.textContent=zoom+"%"}
+
+function setRegionalImageZoom(delta){
+ zoom=delta===0?100:Math.max(75,Math.min(350,zoom+delta));
+ const img=document.getElementById("regionalImageMap");if(img)img.style.width=zoom+"%";
+ const label=document.getElementById("regionalImageZoomLabel");if(label)label.textContent=zoom+" %";
+}
+function setKantoMapZoom(delta){
+ zoom=delta===0?100:Math.max(75,Math.min(300,zoom+delta));
+ const img=document.getElementById("kantoMapImage");
+ if(img)img.style.width=zoom+"%";
+ const label=document.getElementById("kantoZoomLabel");if(label)label.textContent=zoom+" %";
+}
+function mapPlaceInfo(r,i){let p=mapPlaces[r]?.[i];document.getElementById("mapPlaceInfo").innerHTML=`<b>${p}</b><p class="muted">Lieu répertorié dans ${r}. Consulte les routes et les lieux voisins sur la carte.</p>`}
+async function loadFullDex(){
+ const info=document.querySelector("#international .desc");
+ if(info)info.textContent="Chargement des 1 025 espèces et de leurs noms français…";
+ try{
+  const [listRes,namesRes]=await Promise.all([
+   fetch("https://pokeapi.co/api/v2/pokemon?limit=1025"),
+   fetch("https://raw.githubusercontent.com/sindresorhus/pokemon/main/data/fr.json")
+  ]);
+  if(!listRes.ok||!namesRes.ok)throw new Error("Source de données indisponible");
+  const list=await listRes.json(),fr=await namesRes.json();
+  mons=list.results.map((p,i)=>({id:i+1,n:fr[i]||p.name.charAt(0).toUpperCase()+p.name.slice(1),e:"❔",gen:i<151?1:i<251?2:i<386?3:i<493?4:i<649?5:i<721?6:i<810?7:i<906?8:9,stats:[0,0,0,0,0],shiny:false,where:"Consulte les jeux et lieux de rencontre de cette espèce.",attacks:"Données à charger",evo:"Chaîne d'évolution à consulter dans les données du jeu."}));
+  renderLists();refresh();
+  if(info)info.textContent="1 025 Pokémon chargés (Kanto à Paldea). Les statistiques de base se chargent à l’ouverture de chaque fiche. Les attaques et lieux précis varient selon le jeu et restent à compléter.";
+ }catch(err){if(info)info.textContent="Impossible de charger le Pokédex complet pour le moment. Vérifie ta connexion internet ; la sélection locale reste disponible."}
+}
+function renderLists(){document.getElementById("intlList").innerHTML=mons.map(pokemonRow).join("");document.getElementById("regionGrid").innerHTML=regions.map(r=>`<button class="card tile" onclick="showGames('${r}')"><span class="emoji">🌍</span><b>${r}</b><small>${(games[r]||[]).length} jeux listés</small></button>`).join("");document.getElementById("mapGrid").innerHTML=regions.map(r=>`<button class="card tile" onclick="showMap('${r}')"><span class="emoji">🗺️</span><b>${r}</b><small>Afficher les lieux</small></button>`).join("");renderDex()}
+function showGames(r){let box=document.getElementById("gamesBox");box.style.display="block";box.innerHTML=`<b>Jeux de ${r}</b><div class="list">${(games[r]||[]).map(g=>`<button class="choice" onclick="selectGame('${g.replaceAll("'","\\'")}','${r}')">${g}</button>`).join("")}</div><p class="muted" id="gameChosen">Choisis un jeu pour sélectionner son Pokédex.</p>`}
+async function selectGame(g,r){
+ selectedGame=g;selectedRegion=r;
+ const box=document.getElementById("gameChosen");
+ const ids=gameDexes[g]||[];
+ box.innerHTML=`<b class="good">${g} sélectionné</b><p class="muted">Chargement du Pokédex officiel associé…</p><div id="regionalDexResult"></div>`;
+ if(!ids.length){document.getElementById("regionalDexResult").innerHTML="<p class='muted'>Aucune correspondance de Pokédex régional configurée pour ce jeu.</p>";return}
+ const result=document.getElementById("regionalDexResult");
+ try{
+  const dexes=await Promise.all(ids.map(async id=>{
+   if(!dexCache[id]){
+    const response=await fetch(`https://pokeapi.co/api/v2/pokedex/${id}/`);
+    if(!response.ok)throw new Error("Pokédex indisponible: "+id);
+    dexCache[id]=await response.json();
+   }
+   return dexCache[id];
+  }));
+  const unique=new Map();
+  dexes.forEach(d=>d.pokemon_entries.forEach(entry=>{
+   const url=entry.pokemon_species.url;
+   const nationalId=Number(url.match(/\/pokemon-species\/(\d+)\//)?.[1]);
+   if(nationalId)unique.set(nationalId,{id:nationalId,name:entry.pokemon_species.name,regional:entry.entry_number});
+  }));
+  const counts=dexes.map(d=>`<div class="dex-count"><span class="muted">${dexLabels[d.name]||d.name}</span><strong>${d.pokemon_entries.length}</strong><small>entrées dans ce Pokédex</small></div>`).join("");
+  const regionalEntries=[...unique.values()].sort((a,b)=>a.regional-b.regional||a.id-b.id);
+  const regionalDiscovered=regionalEntries.filter(p=>{const local=mons.find(m=>m.id===p.id);return local&&status(local)!=="Non découvert"}).length;
+  result.innerHTML=`<div class="dex-summary"><div class="dex-count"><span class="muted">Total d'espèces uniques</span><strong>${unique.size}</strong><small>sans doublons entre sous-Pokédex</small></div>${counts}</div><input id="regionalDexSearch" placeholder="Rechercher par nom ou numéro" oninput="renderRegionalDex()"><div class="panel" id="regionalDexStats" style="margin-top:10px"></div><div class="list" id="regionalDexList"></div><p class="muted">Liste présentée comme le Pokédex principal : statut, illustration et fiche détaillée. Les numéros régionaux sont indiqués sous le nom.</p><p class="muted">Source : PokéAPI, données du Pokédex régional du jeu.</p>`;
+  window.activeRegionalEntries=regionalEntries;
+  renderRegionalDex();
+ }catch(err){
+  result.innerHTML=`<p class="bad">Impossible de charger les données officielles du Pokédex. Vérifie ta connexion puis sélectionne à nouveau le jeu.</p><small class="muted">${String(err.message||err)}</small>`;
+ }
+}
+
+function regionalStatus(p){
+ const gameState=regionalCollection[selectedGame]||{};
+ if(gameState[p.id])return gameState[p.id];
+ const global=status(p);
+ return selectedRegion==="Kanto" && global==="Chromatique" ? "Capturé" : global;
+}
+function cycleRegionalStatus(id,event){
+ if(event)event.stopPropagation();
+ const p=mons.find(x=>x.id===id);if(!p)return;
+ const current=regionalStatus(p);
+ const hasShiny=selectedRegion!=="Kanto";
+ const next=current==="Non découvert"?"Découvert":current==="Découvert"?"Capturé":hasShiny&&current==="Capturé"?"Chromatique":"Non découvert";
+ if(!regionalCollection[selectedGame])regionalCollection[selectedGame]={};
+ regionalCollection[selectedGame][id]=next;
+ localStorage.setItem("pd2_regional_collection",JSON.stringify(regionalCollection));
+ renderRegionalDex();
+}
+function renderRegionalDex(){
+ const entries=window.activeRegionalEntries||[];
+ const q=(document.getElementById("regionalDexSearch")?.value||"").toLocaleLowerCase("fr");
+ const found=entries.filter(entry=>{const local=mons.find(m=>m.id===entry.id);const name=local?.n||entry.name;return name.toLocaleLowerCase("fr").includes(q)||String(entry.id).includes(q)||String(entry.regional).includes(q)});
+ const list=document.getElementById("regionalDexList");if(!list)return;
+ list.innerHTML=found.map(entry=>{const p=mons.find(m=>m.id===entry.id);if(!p)return `<div class="card pokemon"><div class="sprite"><img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${entry.id}.png" loading="lazy" alt=""></div><div><b>#${entry.id} ???</b><div class="muted">N° régional : ${entry.regional}</div></div></div>`;const s=regionalStatus(p);return `<div class="card pokemon"><button class="pokemon-main" onclick="details(${p.id})" aria-label="Ouvrir la fiche de ${p.n}"><div class="sprite ${s==='Non découvert'?'undiscovered':''}"><img src="${pokemonImage(p,s==='Chromatique')}" alt="${s==='Non découvert'?'Silhouette non découverte':s==='Chromatique'?'Illustration chromatique de '+p.n:p.n}" loading="lazy" onerror="this.style.display='none';this.parentElement.textContent='${p.e}'"></div><div style="flex:1;min-width:0"><b>#${p.id} ${s==='Non découvert'?'???':p.n}</b><div class="muted">N° régional : ${entry.regional} • ${s}</div></div></button><button class="status-button" onclick="cycleRegionalStatus(${p.id},event)" aria-label="Changer le statut de ${p.n}" title="Changer le statut">${statusIcon(s)}</button></div>`}).join("")||"<p class='muted'>Aucun résultat.</p>";
+ const discovered=entries.filter(entry=>{const p=mons.find(m=>m.id===entry.id);return p&&regionalStatus(p)!=="Non découvert"}).length;
+ const captured=entries.filter(entry=>{const p=mons.find(m=>m.id===entry.id);return p&&regionalStatus(p)==="Capturé"}).length;
+ const shiny=entries.filter(entry=>{const p=mons.find(m=>m.id===entry.id);return p&&regionalStatus(p)==="Chromatique"}).length;
+ const stats=document.getElementById("regionalDexStats");if(stats)stats.innerHTML=`<b>Progression de ce Pokédex</b><p class="muted">${discovered}/${entries.length} découverts • ${captured} capturés${selectedRegion!=="Kanto"?` • ${shiny} chromatiques`:""}</p><div class="progress"><i style="width:${entries.length?discovered/entries.length*100:0}%"></i></div>`;
+}
+function mapZoom(n){zoom=Math.max(100,Math.min(500,zoom+n));document.getElementById("zoomLabel").textContent=zoom+"%"}
+function startStats(m){statsMode=m;statsTotal=0;used=[];go("statsGame");document.getElementById("statsMode").textContent=m==="high"?"Plus grand score":"Plus petit score";nextStatPokemon()}
+function nextStatPokemon(){activeMon=mons[Math.floor(Math.random()*mons.length)];document.getElementById("statsArt").textContent=activeMon.e;document.getElementById("statsName").textContent=activeMon.n;document.getElementById("statsScore").textContent=statsTotal;document.getElementById("statsStep").textContent=`Statistique ${used.length+1} sur 5`;document.getElementById("statOptions").innerHTML=statNames.map((n,i)=>`<button class="choice statbtn" ${used.includes(i)?"disabled":""} onclick="revealStat(${i})"><span>${n}</span><b>${used.includes(i)?"Déjà utilisée":"?"}</b></button>`).join("");document.getElementById("statsFeedback").textContent="";document.getElementById("statsNext").style.display="none"}
+function revealStat(i){if(used.includes(i))return;used.push(i);let v=activeMon.stats[i];statsTotal+=v;let btn=[...document.querySelectorAll("#statOptions button")][i];btn.innerHTML=`<span>${statNames[i]}</span><b>${v}</b>`;document.getElementById("statsScore").textContent=statsTotal;document.getElementById("statsFeedback").textContent=`${statNames[i]} : ${v} points ajoutés.`;document.getElementById("statsNext").style.display="inline-block";document.getElementById("statsNext").textContent=used.length===5?"Terminer":"Pokémon suivant"}
+function statsNext(){if(used.length<5){nextStatPokemon();return}let key=statsMode==="high"?"pd2_high":"pd2_low",old=localStorage.getItem(key),best=old===null||(statsMode==="high"?statsTotal>+old:statsTotal<+old);if(best)localStorage.setItem(key,String(statsTotal));document.getElementById("statsFinal").textContent=statsTotal;document.getElementById("statsRecordText").innerHTML=best?'<span class="good">Nouveau record personnel !</span>':'Ton record personnel est conservé.';go("statsEnd")}
+function startGuess(m){if(m==="hardcore"&&normalPts<40){alert("Le mode Hardcore se débloque à 40 points en mode normal.");return}guessMode=m;guessTotal=0;go("guessGame");document.getElementById("guessMode").textContent=m==="hardcore"?"Mode Hardcore":"Mode normal";newGuess()}
+function newGuess(){guessPhase="name";bonusMon=null;guessMon=mons[Math.floor(Math.random()*mons.length)];document.getElementById("guessArt").classList.add("guess-silhouette");document.getElementById("guessArt").innerHTML=`<img src="${pokemonImage(guessMon)}" alt="Silhouette noire du Pokémon" onerror="this.style.display='none';this.parentElement.textContent='❔'">`;document.getElementById("guessPrompt").textContent="Quel est ce Pokémon ?";let opts=[guessMon];while(opts.length<4){let p=mons[Math.floor(Math.random()*mons.length)];if(!opts.some(x=>x.id===p.id))opts.push(p)}opts.sort(()=>Math.random()-.5);document.getElementById("guessOptions").innerHTML=opts.map(p=>`<button class="choice" onclick="answerGuess(${p.id})">${p.n}</button>`).join("");document.getElementById("guessFeedback").textContent="";document.getElementById("guessNext").style.display="none";document.getElementById("guessScore").textContent=guessTotal}
+function answerGuess(id){document.querySelectorAll("#guessOptions button").forEach(b=>b.disabled=true);if(id===guessMon.id){guessTotal+=10;if(guessMode==="normal"){normalPts+=10;localStorage.setItem("pd2_normal",normalPts)}document.getElementById("guessArt").classList.remove("guess-silhouette");document.getElementById("guessArt").innerHTML=`<img src="${pokemonImage(guessMon)}" alt="${guessMon.n}">`;document.getElementById("guessFeedback").innerHTML='<span class="good">Bonne réponse ! +10 points</span>';if(guessMode==="hardcore"&&Math.random()<.5){bonusMon={...guessMon,shiny:Math.random()<.5};document.getElementById("guessPrompt").textContent="Question supplémentaire possible…";document.getElementById("guessNext").style.display="inline-block";document.getElementById("guessNext").textContent="Continuer";setTimeout(()=>{if(bonusMon&&guessPhase==="name")showBonus()},450);return}}else{document.getElementById("guessArt").classList.remove("guess-silhouette");document.getElementById("guessArt").innerHTML=`<img src="${pokemonImage(guessMon)}" alt="${guessMon.n}">`;document.getElementById("guessFeedback").innerHTML=`<span class="bad">Raté ! C'était ${guessMon.n}.</span>`}document.getElementById("guessScore").textContent=guessTotal;document.getElementById("guessNext").style.display="inline-block";document.getElementById("guessNext").textContent="Pokémon suivant";refresh()}
+function showBonus(){guessPhase="shiny";document.getElementById("guessArt").classList.remove("guess-silhouette");document.getElementById("guessArt").innerHTML=`<img src="${pokemonImage(bonusMon,bonusMon.shiny)}" alt="${bonusMon.shiny?"Pokémon chromatique":"Pokémon normal"}">`;document.getElementById("guessPrompt").textContent="Ce Pokémon est-il chromatique ?";document.getElementById("guessOptions").innerHTML='<button class="choice" onclick="answerBonus(true)">Oui</button><button class="choice" onclick="answerBonus(false)">Non</button>';document.getElementById("guessFeedback").innerHTML='<span class="tag">Question bonus</span> Réponds oui ou non.';document.getElementById("guessNext").style.display="none"}
+function answerBonus(ans){document.querySelectorAll("#guessOptions button").forEach(b=>b.disabled=true);if(ans===bonusMon.shiny){guessTotal+=10;document.getElementById("guessFeedback").innerHTML='<span class="good">Bonne réponse ! +10 points bonus</span>'}else document.getElementById("guessFeedback").innerHTML='<span class="bad">Mauvaise réponse.</span>';document.getElementById("guessScore").textContent=guessTotal;document.getElementById("guessNext").style.display="inline-block";document.getElementById("guessNext").textContent="Pokémon suivant";bonusMon=null;refresh()}
+function guessNext(){bonusMon=null;newGuess();refresh()}
+renderLists();refresh();loadFullDex();
+</script></body></html>
